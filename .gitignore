@@ -12,7 +12,7 @@ Desktop.ini
 # .NET and PowerShell packaging build artifacts
 bin/
 obj/
-Start-OfficeLTSC2024-Bundle.exe
+Office 2024 LTSC Setup.exe
 Office/
 
 # Python cache

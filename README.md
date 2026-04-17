@@ -108,7 +108,7 @@ The build script will:
 
 - install `ps2exe` automatically if `Invoke-ps2exe` is not available
 - import `ps2exe`
-- build `Start-OfficeLTSC2024-Bundle.exe`
+- build `Office 2024 LTSC Setup.exe`
 
 ## Tests
 
@@ -133,7 +133,7 @@ The workflow at `.github/workflows/build-office-bundle.yml`:
 - runs on `windows-latest`
 - installs `ps2exe`
 - runs `build-office-bundle.ps1`
-- uploads `Start-OfficeLTSC2024-Bundle.exe` as a workflow artifact
+- uploads `Office 2024 LTSC Setup.exe` as a workflow artifact
 
 This keeps the repo small while still allowing reproducible CI builds.
 

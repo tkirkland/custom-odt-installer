@@ -89,16 +89,24 @@ if ($buildScriptContent -notmatch 'Install-Module\s+ps2exe' -or $buildScriptCont
     throw 'Expected build-office-bundle.ps1 to bootstrap ps2exe from PowerShell Gallery and call Invoke-ps2exe.'
 }
 
+if ($buildScriptContent -notmatch [regex]::Escape("Office 2024 LTSC Setup.exe")) {
+    throw 'Expected build-office-bundle.ps1 to emit Office 2024 LTSC Setup.exe.'
+}
+
+if ($scriptContent -notmatch '\$appTitle\s*=\s*''Office 2024 LTSC Setup''') {
+    throw 'Expected the launcher UI title to be Office 2024 LTSC Setup.'
+}
+
 if (-not $workflowContent) {
     throw 'Expected a GitHub Actions workflow for building the Office bundle.'
 }
 
-if ($workflowContent -notmatch 'Install-Module\s+ps2exe' -or $workflowContent -notmatch 'build-office-bundle\.ps1' -or $workflowContent -notmatch 'upload-artifact') {
-    throw 'Expected the GitHub Actions workflow to install ps2exe, run build-office-bundle.ps1, and upload the built exe.'
+if ($workflowContent -notmatch 'Install-Module\s+ps2exe' -or $workflowContent -notmatch 'build-office-bundle\.ps1' -or $workflowContent -notmatch 'upload-artifact' -or $workflowContent -notmatch [regex]::Escape('Office 2024 LTSC Setup.exe')) {
+    throw 'Expected the GitHub Actions workflow to install ps2exe, run build-office-bundle.ps1, and upload Office 2024 LTSC Setup.exe.'
 }
 
-if ($gitignoreContent -notmatch '(?m)^Start-OfficeLTSC2024-Bundle\.exe$') {
-    throw 'Expected .gitignore to ignore Start-OfficeLTSC2024-Bundle.exe.'
+if ($gitignoreContent -notmatch '(?m)^Office 2024 LTSC Setup\.exe$') {
+    throw 'Expected .gitignore to ignore Office 2024 LTSC Setup.exe.'
 }
 
 $initialDialogPattern = '(\$initialDialogResult\s*=\s*Show-ThemedDialog[\s\S]*?-CloseConfirmationMessage\s+''Exit the Office installer\?''[\s\S]*?if\s*\(\$initialDialogResult\s*-ne\s*\[System\.Windows\.Forms\.DialogResult\]::OK\)\s*\{[\s\S]*?exit\s+0)'
@@ -106,11 +114,43 @@ if ($scriptContent -notmatch $initialDialogPattern) {
     throw 'Expected the initial warning dialog to confirm X-close and exit when dismissed without OK.'
 }
 
-if ($scriptContent -match '-CancelText\s+''Exit''') {
+$initialDialogCallMatch = [regex]::Match($scriptContent, '\$initialDialogResult\s*=\s*Show-ThemedDialog[^\r\n]*')
+if (-not $initialDialogCallMatch.Success) {
+    throw 'Expected an initial warning dialog call.'
+}
+
+if ($initialDialogCallMatch.Value -match '-CancelText\s+''Exit''') {
     throw 'Did not expect an explicit Exit button on the initial warning dialog.'
+}
+
+$downloadPromptPattern = '(?s)\$downloadPrompt\s*=\s*Show-ThemedDialog[\s\S]*?Could not locate the Office payload\.[\s\S]*?Download Office files now\?[\s\S]*?-OkText\s+''Download''[\s\S]*?-CancelText\s+''Exit''[\s\S]*?-CloseConfirmationMessage\s+''Exit the Office installer\?'''
+if ($scriptContent -notmatch $downloadPromptPattern) {
+    throw 'Expected a download prompt when the Office payload is missing.'
+}
+
+$downloadExitPattern = '(?s)\$downloadPrompt\s*=\s*Show-ThemedDialog[\s\S]*?if\s*\(\$downloadPrompt\s*-ne\s*\[System\.Windows\.Forms\.DialogResult\]::OK\)\s*\{[\s\S]*?exit\s+0'
+if ($scriptContent -notmatch $downloadExitPattern) {
+    throw 'Expected the missing-payload download dialog to exit when dismissed after X confirmation or Cancel.'
+}
+
+$downloadFlowPattern = '(?s)\$downloadPayloadRoot\s*=\s*Join-Path\s+\$workDir\s+''Office''[\s\S]*?Invoke-OdtSetup\s+-SetupPath\s+\$setupPath\s+-Mode\s+''/download'''
+if ($scriptContent -notmatch $downloadFlowPattern) {
+    throw 'Expected the script to download Office files into the temp work directory when payload is missing.'
+}
+
+$chooserOrderingPattern = '(?s)if\s*\(-not\s*\$payloadRoot\)[\s\S]*?\$form\s*=\s*New-Object\s+System\.Windows\.Forms\.Form'
+if ($scriptContent -notmatch $chooserOrderingPattern) {
+    throw 'Expected the app chooser dialog to be created only after payload resolution and download prompting.'
+}
+
+$retainFlowPattern = '(?s)Show-ThemedDialog\s+-Title\s+\$appTitle\s+-Message\s+''Keep the downloaded Office files for future installs\?''[\s\S]*?Move-Item\s+-LiteralPath\s+\$downloadPayloadRoot\s+-Destination\s+\$retainedPayloadRoot'
+if ($scriptContent -notmatch $retainFlowPattern) {
+    throw 'Expected the script to offer keeping downloaded Office files and move temp Office into the launch directory.'
 }
 
 Write-Host 'PASS: ConvertTo-XmlAttributeValue escapes XML-significant characters.'
 Write-Host 'PASS: Write-BundledFile validates extracted bundled files.'
 Write-Host 'PASS: build-office-bundle.ps1 bootstraps ps2exe and workflow builds/uploads the packaged exe.'
 Write-Host 'PASS: initial warning dialog confirms X-close and exits when dismissed without OK.'
+Write-Host 'PASS: missing payload triggers temp download and optional retention flow.'
+Write-Host 'PASS: package name and UI title use Office 2024 LTSC Setup.'

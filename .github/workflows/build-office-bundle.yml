@@ -29,4 +29,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: office-installer-exe
-          path: Start-OfficeLTSC2024-Bundle.exe
+          path: Office 2024 LTSC Setup.exe

@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path -Parent $PSCommandPath
 $bundleScript = Join-Path $projectRoot 'Start-OfficeLTSC2024-Bundle.ps1'
-$bundleExe = Join-Path $projectRoot 'Start-OfficeLTSC2024-Bundle.exe'
+$bundleExe = Join-Path $projectRoot 'Office 2024 LTSC Setup.exe'
 $iconPath = Join-Path $projectRoot 'setup-icon.ico'
 
 if (-not (Test-Path -LiteralPath $bundleScript)) {
@@ -28,9 +28,9 @@ Invoke-ps2exe `
     -inputFile $bundleScript `
     -outputFile $bundleExe `
     -iconFile $iconPath `
-    -title 'Office Installer' `
-    -description 'Launches the Microsoft Office installer.' `
-    -product 'Office Installer' `
+    -title 'Office 2024 LTSC Setup' `
+    -description 'Launches the Office 2024 LTSC installer.' `
+    -product 'Office 2024 LTSC Setup' `
     -company 'tkirkland' `
     -version '1.0.0' `
     -x64 `
