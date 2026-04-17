@@ -85,8 +85,8 @@ if ($buildScriptContent -match [regex]::Escape('tools\ps2exe')) {
     throw 'Did not expect build-office-bundle.ps1 to reference vendored ps2exe files.'
 }
 
-if ($buildScriptContent -notmatch 'Install-Module\s+ps2exe' -or $buildScriptContent -notmatch 'Import-Module\s+ps2exe' -or $buildScriptContent -notmatch 'Invoke-ps2exe') {
-    throw 'Expected build-office-bundle.ps1 to bootstrap ps2exe from PowerShell Gallery and call Invoke-ps2exe.'
+if ($buildScriptContent -notmatch 'Install-Module\s+ps2exe' -or $buildScriptContent -notmatch '-RequiredVersion\s+1\.0\.17' -or $buildScriptContent -notmatch 'Import-Module\s+ps2exe' -or $buildScriptContent -notmatch 'Invoke-ps2exe') {
+    throw 'Expected build-office-bundle.ps1 to pin ps2exe version 1.0.17 and call Invoke-ps2exe.'
 }
 
 if ($buildScriptContent -notmatch [regex]::Escape("Office 2024 LTSC Setup.exe")) {
@@ -101,8 +101,12 @@ if (-not $workflowContent) {
     throw 'Expected a GitHub Actions workflow for building the Office bundle.'
 }
 
-if ($workflowContent -notmatch 'Install-Module\s+ps2exe' -or $workflowContent -notmatch 'build-office-bundle\.ps1' -or $workflowContent -notmatch 'upload-artifact' -or $workflowContent -notmatch [regex]::Escape('Office 2024 LTSC Setup.exe')) {
-    throw 'Expected the GitHub Actions workflow to install ps2exe, run build-office-bundle.ps1, and upload Office 2024 LTSC Setup.exe.'
+if ($workflowContent -notmatch 'Install-Module\s+ps2exe' -or $workflowContent -notmatch '-RequiredVersion\s+1\.0\.17' -or $workflowContent -notmatch 'build-office-bundle\.ps1' -or $workflowContent -notmatch 'upload-artifact' -or $workflowContent -notmatch [regex]::Escape('Office 2024 LTSC Setup.exe')) {
+    throw 'Expected the GitHub Actions workflow to pin ps2exe version 1.0.17, run build-office-bundle.ps1, and upload Office 2024 LTSC Setup.exe.'
+}
+
+if ($workflowContent -notmatch '(?m)^on:\s*$[\s\S]*?^\s+workflow_dispatch:\s*$' -or $workflowContent -match '(?m)^\s+push:\s*$' -or $workflowContent -match '(?m)^\s+pull_request:\s*$') {
+    throw 'Expected the GitHub Actions packaging workflow to run only on manual workflow_dispatch.'
 }
 
 if ($gitignoreContent -notmatch '(?m)^Office 2024 LTSC Setup\.exe$') {

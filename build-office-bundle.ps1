@@ -19,7 +19,7 @@ if (-not (Get-Command -Name Invoke-ps2exe -ErrorAction SilentlyContinue)) {
         Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
     }
 
-    Install-Module ps2exe -Scope CurrentUser -Force -AllowClobber
+    Install-Module ps2exe -RequiredVersion 1.0.17 -Scope CurrentUser -Force -AllowClobber
 }
 
 Import-Module ps2exe -Force

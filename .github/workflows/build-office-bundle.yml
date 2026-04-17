@@ -2,10 +2,6 @@ name: Build Office Bundle
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
 
 jobs:
   build:
@@ -19,7 +15,7 @@ jobs:
         shell: pwsh
         run: |
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-          Install-Module ps2exe -Scope CurrentUser -Force -AllowClobber
+          Install-Module ps2exe -RequiredVersion 1.0.17 -Scope CurrentUser -Force -AllowClobber
 
       - name: Build installer
         shell: pwsh
