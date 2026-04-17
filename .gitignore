@@ -1,0 +1,25 @@
+# Windows shell metadata
+Thumbs.db
+Desktop.ini
+
+# Editor and user-specific files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET and PowerShell packaging build artifacts
+bin/
+obj/
+Start-OfficeLTSC2024-Bundle.exe
+Office/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generic temporary files
+*.tmp
+*.temp
+*.bak

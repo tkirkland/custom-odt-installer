@@ -1,0 +1,12 @@
+<Configuration>
+  <Add SourcePath="__PAYLOAD_ROOT__" OfficeClientEdition="64" Channel="PerpetualVL2024">
+    <Product ID="ProPlus2024Volume">
+      <Language ID="en-us" />
+      <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="PowerPoint" />
+      <ExcludeApp ID="Publisher" />
+    </Product>
+  </Add>
+  <Property Name="AUTOACTIVATE" Value="1" />
+  <Display Level="Full" AcceptEULA="TRUE" />
+</Configuration>
