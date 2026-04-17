@@ -13,7 +13,6 @@ The project is intended for environments that already have a prepared Office pay
 
 ## What This Repo Contains
 
-- [Start-OfficeLTSC2024-Bundle.ps1](/C:/Users/tkirkland/Desktop/codex-projects/office-installer/Start-OfficeLTSC2024-Bundle.ps1)
 - [Start-OfficeLTSC2024-Bundle.ps1](Start-OfficeLTSC2024-Bundle.ps1)
   - the main launcher source
   - contains the embedded ODT bootstrap executable and embedded XML template
@@ -22,7 +21,7 @@ The project is intended for environments that already have a prepared Office pay
 - [configuration.template.xml](configuration.template.xml)
   - the human-readable source template that corresponds to the embedded XML configuration
 - [tests/Start-OfficeLTSC2024-Bundle.Tests.ps1](tests/Start-OfficeLTSC2024-Bundle.Tests.ps1)
-  - regression checks for config escaping, bundled-file extraction validation, build bootstrap behavior, and dlg1 close handling
+  - regression checks for config escaping, bundled-file extraction validation, build bootstrap behavior, dialog close handling, payload download flow, and package naming
 - [.github/workflows/build-office-bundle.yml](.github/workflows/build-office-bundle.yml)
   - GitHub Actions workflow that installs `ps2exe`, builds the launcher, and uploads the packaged `.exe`
 
@@ -52,13 +51,16 @@ Office/
 When the launcher starts, it:
 
 1. shows the initial activation warning dialog
-2. if the user closes dlg1 with `X`, it asks for confirmation before exiting
+2. if the user closes the initial warning dialog with `X`, it asks for confirmation before exiting
 3. decodes the embedded ODT bootstrap files into a temp working directory
 4. validates that extraction succeeded
-5. searches for the Office payload
-6. shows the app-selection UI
-7. writes a temporary ODT configuration file
-8. launches `setup.exe /configure`
+5. searches for an existing Office payload in the launch directory and mounted filesystem roots
+6. if no payload is found, prompts the user to download Office files into the temp working directory
+7. if the user closes the download prompt with `X`, it asks for confirmation before exiting
+8. after a valid payload is available, shows the app-selection UI
+9. writes a temporary ODT configuration file
+10. launches `setup.exe /configure`
+11. if the payload was downloaded into temp and install succeeds, asks whether to keep the downloaded Office files by moving `temp\Office` to `.\Office`
 
 ### Payload Discovery
 
@@ -124,7 +126,10 @@ The tests currently verify:
 - bundled-file extraction validation
 - build bootstrap behavior for `ps2exe`
 - GitHub Actions workflow coverage for build artifact generation
-- dlg1 `X` close confirmation behavior
+- initial warning dialog `X` close confirmation behavior
+- missing-payload download prompt and temp download/install flow
+- optional post-install retention of downloaded Office files
+- package/UI naming for `Office 2024 LTSC Setup`
 
 ## GitHub Actions
 
@@ -140,6 +145,7 @@ This keeps the repo small while still allowing reproducible CI builds.
 ## Important Notes
 
 - The packaged `.exe` is ignored in git and should be treated as a build artifact.
+- The packaged output name is `Office 2024 LTSC Setup.exe`.
 - The Office payload is not included in this public repo.
 - The launcher embeds its own ODT bootstrap executable and configuration template, but it still needs the Office installation media at runtime.
 - The current payload validation is intentionally narrow and expects the media layout described above.
