@@ -17,7 +17,7 @@ The project is intended for environments that already have a prepared Office pay
   - the main launcher source
   - contains the embedded ODT bootstrap executable and embedded XML template
 - [build-office-bundle.ps1](build-office-bundle.ps1)
-  - builds the packaged `.exe` using `ps2exe`
+  - packaging helper used by the GitHub Actions workflow
 - [configuration.template.xml](configuration.template.xml)
   - the human-readable source template that corresponds to the embedded XML configuration
 - [tests/Start-OfficeLTSC2024-Bundle.Tests.ps1](tests/Start-OfficeLTSC2024-Bundle.Tests.ps1)
@@ -93,24 +93,13 @@ The template excludes these apps by default:
 
 The launcher then lets the end user enable or disable supported apps interactively before installation.
 
-## Local Build
+## Distribution
 
-Build requirements:
+End users are expected to run the packaged installer:
 
-- Windows PowerShell or PowerShell on Windows
-- internet access to PowerShell Gallery on first build
+- `Office 2024 LTSC Setup.exe`
 
-Build command:
-
-```powershell
-./build-office-bundle.ps1
-```
-
-The build script will:
-
-- install `ps2exe` automatically if `Invoke-ps2exe` is not available
-- import `ps2exe`
-- build `Office 2024 LTSC Setup.exe`
+This repository is source-first. The packaged `.exe` is treated as a build artifact, not as a source-controlled deliverable.
 
 ## Tests
 
@@ -140,7 +129,13 @@ The workflow at `.github/workflows/build-office-bundle.yml`:
 - runs `build-office-bundle.ps1`
 - uploads `Office 2024 LTSC Setup.exe` as a workflow artifact
 
-This keeps the repo small while still allowing reproducible CI builds.
+This is the supported packaging path for the project.
+
+## Packaging
+
+`build-office-bundle.ps1` exists to support the GitHub Actions workflow. It is not intended to be a normal end-user build path.
+
+If you need a packaged installer, use the GitHub Actions artifact produced by `.github/workflows/build-office-bundle.yml`.
 
 ## Important Notes
 
@@ -149,13 +144,3 @@ This keeps the repo small while still allowing reproducible CI builds.
 - The Office payload is not included in this public repo.
 - The launcher embeds its own ODT bootstrap executable and configuration template, but it still needs the Office installation media at runtime.
 - The current payload validation is intentionally narrow and expects the media layout described above.
-
-## Suggested Repo Workflow
-
-For source changes:
-
-1. update the PowerShell source
-2. run the test script
-3. rebuild locally if you need to test the packaged `.exe`
-4. push changes
-5. use the GitHub Actions artifact for CI-built packages if needed
