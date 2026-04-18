@@ -7,6 +7,7 @@ This project packages a Windows Forms launcher that:
 - shows an initial activation warning
 - lets the user choose which Office apps to install
 - generates an ODT configuration file from the embedded template
+- downloads the Office payload when approved local media is not available
 - runs the embedded `setup.exe` with the generated configuration
 
 ## Documentation
@@ -26,7 +27,7 @@ Persistent project context lives in:
 The project is intended for managed environments that either:
 
 - already have approved Office media available locally, or
-- want the launcher to download the Office payload before installation
+- want the launcher to download the Office payload before installation when local media is missing
 
 ## What This Repo Contains
 
@@ -52,6 +53,8 @@ That means two things can both be true:
 
 - a local working copy may contain `Office/` media for testing or packaging validation
 - the repository itself should be treated as source-first, with Office media supplied separately at runtime
+
+At runtime, that payload may come from either preexisting approved media or the launcher's download-if-missing flow.
 
 The built launcher expects an Office payload directory that looks like this at runtime:
 
