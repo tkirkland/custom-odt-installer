@@ -1,6 +1,6 @@
-# custom-odt-installer
+# office-installer
 
-A custom Microsoft Office LTSC 2024 installer built around the Office Deployment Tool (ODT).
+A focused Microsoft Office LTSC 2024 installer wrapper built around the Office Deployment Tool (ODT).
 
 This project packages a Windows Forms launcher that:
 
@@ -23,13 +23,18 @@ Persistent project context lives in:
 
 `README.md` stays concise and user-facing. The files above capture durable product context and agent operating guidance.
 
-The project is intended for environments that already have a prepared Office payload available on local media or in a working directory.
+The project is intended for managed environments that either:
+
+- already have approved Office media available locally, or
+- want the launcher to download the Office payload before installation
 
 ## What This Repo Contains
 
 - [Start-OfficeLTSC2024-Bundle.ps1](Start-OfficeLTSC2024-Bundle.ps1)
   - the main launcher source
   - contains the embedded ODT bootstrap executable and embedded XML template
+- [setup.exe](setup.exe)
+  - bundled Office Deployment Tool bootstrap used at runtime
 - [build-office-bundle.ps1](build-office-bundle.ps1)
   - packaging helper used by the GitHub Actions workflow
 - [configuration.template.xml](configuration.template.xml)
@@ -39,15 +44,14 @@ The project is intended for environments that already have a prepared Office pay
 - [.github/workflows/build-office-bundle.yml](.github/workflows/build-office-bundle.yml)
   - GitHub Actions workflow that installs `ps2exe`, builds the launcher, and uploads the packaged `.exe`
 
-## What Is Not Included
+## Payload In Repo Vs. Distribution
 
-The runtime Office payload under `Office/` is intentionally excluded from the public repo.
+The Office payload directory under `Office/` is ignored by git and is not part of the intended source-controlled deliverable.
 
-Why:
+That means two things can both be true:
 
-- the payload is too large for a practical GitHub repo
-- the local payload in this project contains multi-gigabyte stream files
-- the launcher is designed to locate Office media at runtime rather than require those files to live in the source repository
+- a local working copy may contain `Office/` media for testing or packaging validation
+- the repository itself should be treated as source-first, with Office media supplied separately at runtime
 
 The built launcher expects an Office payload directory that looks like this at runtime:
 
@@ -105,7 +109,16 @@ The template excludes these apps by default:
 - `PowerPoint`
 - `Publisher`
 
-The launcher then lets the end user enable or disable supported apps interactively before installation.
+The launcher then lets the end user enable or disable the supported app set interactively:
+
+- `Word`
+- `Excel`
+- `Outlook`
+- `PowerPoint`
+- `OneNote`
+- `Access`
+- `Publisher`
+- `Lync` / Skype for Business
 
 ## Distribution
 
@@ -155,6 +168,6 @@ If you need a packaged installer, use the GitHub Actions artifact produced by `.
 
 - The packaged `.exe` is ignored in git and should be treated as a build artifact.
 - The packaged output name is `Office 2024 LTSC Setup.exe`.
-- The Office payload is not included in this public repo.
+- The Office payload is not intended to be source-controlled in this repo.
 - The launcher embeds its own ODT bootstrap executable and configuration template, but it still needs the Office installation media at runtime.
 - The current payload validation is intentionally narrow and expects the media layout described above.
