@@ -9,6 +9,20 @@ This project packages a Windows Forms launcher that:
 - generates an ODT configuration file from the embedded template
 - runs the embedded `setup.exe` with the generated configuration
 
+## Documentation
+
+Persistent project context lives in:
+
+- [docs/product-vision.md](docs/product-vision.md)
+- [docs/product-state.md](docs/product-state.md)
+- [docs/architecture.md](docs/architecture.md)
+- [docs/decisions.md](docs/decisions.md)
+- [docs/roadmap.md](docs/roadmap.md)
+- [docs/test-strategy.md](docs/test-strategy.md)
+- [AGENTS.md](AGENTS.md)
+
+`README.md` stays concise and user-facing. The files above capture durable product context and agent operating guidance.
+
 The project is intended for environments that already have a prepared Office payload available on local media or in a working directory.
 
 ## What This Repo Contains
